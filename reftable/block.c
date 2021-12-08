@@ -382,7 +382,7 @@ int block_reader_seek(struct block_reader *br, struct block_iter *it,
 		.key = *want,
 		.r = br,
 	};
-	struct reftable_record rec = reftable_new_record(block_reader_type(br));
+	struct reftable_record rec = reftable_record_for(block_reader_type(br));
 	struct strbuf key = STRBUF_INIT;
 	int err = 0;
 	struct block_iter next = {
@@ -424,7 +424,7 @@ int block_reader_seek(struct block_reader *br, struct block_iter *it,
 done:
 	strbuf_release(&key);
 	strbuf_release(&next.last_key);
-	reftable_record_destroy(&rec);
+	reftable_record_release(&rec);
 
 	return err;
 }
