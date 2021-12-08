@@ -707,7 +707,8 @@ done:
 	strbuf_release(&temp_tab_file_name);
 	strbuf_release(&tab_file_name);
 	strbuf_release(&next_name);
-	reftable_writer_free(wr);
+	if (wr)
+		reftable_writer_free(wr);
 	return err;
 }
 

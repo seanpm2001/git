@@ -796,6 +796,7 @@ int reftable_reader_print_file(const char *tablename)
 	reftable_table_from_reader(&tab, r);
 	err = reftable_table_print(&tab);
 done:
-	reftable_reader_free(r);
+	if (r)
+		reftable_reader_free(r);
 	return err;
 }
