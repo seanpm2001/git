@@ -22,7 +22,7 @@ static int merged_iter_init(struct merged_iter *mi)
 {
 	int i = 0;
 	for (i = 0; i < mi->stack_len; i++) {
-		struct reftable_record rec = reftable_new_record(mi->typ);
+		struct reftable_record rec = reftable_record_for(mi->typ);
 		int err = iterator_next(&mi->stack[i], &rec);
 		if (err < 0) {
 			return err;
@@ -30,7 +30,7 @@ static int merged_iter_init(struct merged_iter *mi)
 
 		if (err > 0) {
 			reftable_iterator_destroy(&mi->stack[i]);
-			reftable_record_destroy(&rec);
+			reftable_record_release(&rec);
 		} else {
 			struct pq_entry e = {
 				.rec = rec,
@@ -57,18 +57,17 @@ static void merged_iter_close(void *p)
 static int merged_iter_advance_nonnull_subiter(struct merged_iter *mi,
 					       size_t idx)
 {
-	struct reftable_record rec = reftable_new_record(mi->typ);
 	struct pq_entry e = {
-		.rec = rec,
+		.rec = reftable_record_for(mi->typ),
 		.index = idx,
 	};
-	int err = iterator_next(&mi->stack[idx], &rec);
+	int err = iterator_next(&mi->stack[idx], &e.rec);
 	if (err < 0)
 		return err;
 
 	if (err > 0) {
 		reftable_iterator_destroy(&mi->stack[idx]);
-		reftable_record_destroy(&rec);
+		reftable_record_release(&e.rec);
 		return 0;
 	}
 
@@ -126,11 +125,11 @@ static int merged_iter_next_entry(struct merged_iter *mi,
 		if (err < 0) {
 			return err;
 		}
-		reftable_record_destroy(&top.rec);
+		reftable_record_release(&top.rec);
 	}
 
 	reftable_record_copy_from(rec, &entry.rec, hash_size(mi->hash_id));
-	reftable_record_destroy(&entry.rec);
+	reftable_record_release(&entry.rec);
 	strbuf_release(&entry_key);
 	return 0;
 }
@@ -246,7 +245,7 @@ static int merged_table_seek_record(struct reftable_merged_table *mt,
 		sizeof(struct reftable_iterator) * mt->stack_len);
 	struct merged_iter merged = {
 		.stack = iters,
-		.typ = reftable_record_type(rec),
+		.typ = rec->type,
 		.hash_id = mt->hash_id,
 		.suppress_deletions = mt->suppress_deletions,
 	};
@@ -290,11 +289,12 @@ int reftable_merged_table_seek_ref(struct reftable_merged_table *mt,
 				   struct reftable_iterator *it,
 				   const char *name)
 {
-	struct reftable_ref_record ref = {
-		.refname = (char *)name,
+	struct reftable_record rec = {
+		.type = BLOCK_TYPE_REF,
+		.u.ref = {
+			.refname = (char *)name,
+		},
 	};
-	struct reftable_record rec = { NULL };
-	reftable_record_from_ref(&rec, &ref);
 	return merged_table_seek_record(mt, it, &rec);
 }
 
@@ -302,12 +302,13 @@ int reftable_merged_table_seek_log_at(struct reftable_merged_table *mt,
 				      struct reftable_iterator *it,
 				      const char *name, uint64_t update_index)
 {
-	struct reftable_log_record log = {
-		.refname = (char *)name,
-		.update_index = update_index,
+	struct reftable_record rec = {
+		.type = BLOCK_TYPE_LOG,
+		.u.log = {
+			.refname = (char *)name,
+			.update_index = update_index,
+		}
 	};
-	struct reftable_record rec = { NULL };
-	reftable_record_from_log(&rec, &log);
 	return merged_table_seek_record(mt, it, &rec);
 }
 
