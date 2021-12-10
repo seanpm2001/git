@@ -2935,10 +2935,21 @@ export TEST_NO_MALLOC_CHECK
 test: all
 	$(MAKE) -C t/ all
 
+# Additional tests from places in contrib/ that are prepared to take
+# "make -C $there test", but expects that the primary build is done
+# already.
+test-extra: all
+	$(MAKE) -C contrib/credential/netrc test
+	$(MAKE) -C contrib/diff-highlight test
+	$(MAKE) -C contrib/mw-to-git test
+	$(MAKE) -C contrib/subtree test
+
+test-all:: test test-extra
+
 perf: all
 	$(MAKE) -C t/perf/ all
 
-.PHONY: test perf
+.PHONY: test test-extra test-all perf
 
 .PRECIOUS: $(TEST_OBJS)
 
