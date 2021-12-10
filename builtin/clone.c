@@ -903,7 +903,7 @@ int cmd_clone(int argc, const char **argv, const char *prefix)
 			die(_("--bare and --origin %s options are incompatible."),
 			    option_origin);
 		if (real_git_dir)
-			die(_("--bare and --separate-git-dir are incompatible."));
+			die(_("%s and %s are mutually exclusive"), "--bare", "--separate-git-dir");
 		option_no_checkout = 1;
 	}
 

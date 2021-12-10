@@ -681,7 +681,7 @@ int cmd_repack(int argc, const char **argv, const char *prefix)
 
 	if (keep_unreachable &&
 	    (unpack_unreachable || (pack_everything & LOOSEN_UNREACHABLE)))
-		die(_("--keep-unreachable and -A are incompatible"));
+		die(_("%s and %s are mutually exclusive"), "--keep-unreachable", "-A");
 
 	if (write_bitmaps < 0) {
 		if (!write_midx &&
@@ -712,7 +712,7 @@ int cmd_repack(int argc, const char **argv, const char *prefix)
 
 	if (geometric_factor) {
 		if (pack_everything)
-			die(_("--geometric is incompatible with -A, -a"));
+			die(_("%s and %s are mutually exclusive"),"--geometric", "-A/-a");
 		init_pack_geometry(&geometry);
 		split_pack_geometry(geometry, geometric_factor);
 	}

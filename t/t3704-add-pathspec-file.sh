@@ -138,13 +138,13 @@ test_expect_success 'error conditions' '
 	>empty_list &&
 
 	test_must_fail git add --pathspec-from-file=list --interactive 2>err &&
-	test_i18ngrep -e "--pathspec-from-file is incompatible with --interactive/--patch" err &&
+	test_i18ngrep -e "--pathspec-from-file and --interactive/--patch are mutually exclusive" err &&
 
 	test_must_fail git add --pathspec-from-file=list --patch 2>err &&
-	test_i18ngrep -e "--pathspec-from-file is incompatible with --interactive/--patch" err &&
+	test_i18ngrep -e "--pathspec-from-file and --interactive/--patch are mutually exclusive" err &&
 
 	test_must_fail git add --pathspec-from-file=list --edit 2>err &&
-	test_i18ngrep -e "--pathspec-from-file is incompatible with --edit" err &&
+	test_i18ngrep -e "--pathspec-from-file and --edit are mutually exclusive" err &&
 
 	test_must_fail git add --pathspec-from-file=list -- fileA.t 2>err &&
 	test_i18ngrep -e "--pathspec-from-file is incompatible with pathspec arguments" err &&

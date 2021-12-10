@@ -423,7 +423,7 @@ int cmd_reset(int argc, const char **argv, const char *prefix)
 
 	if (pathspec_from_file) {
 		if (patch_mode)
-			die(_("--pathspec-from-file is incompatible with --patch"));
+			die(_("%s and %s are mutually exclusive"), "--pathspec-from-file", "--patch");
 
 		if (pathspec.nr)
 			die(_("--pathspec-from-file is incompatible with pathspec arguments"));
@@ -432,7 +432,7 @@ int cmd_reset(int argc, const char **argv, const char *prefix)
 				    PATHSPEC_PREFER_FULL,
 				    prefix, pathspec_from_file, pathspec_file_nul);
 	} else if (pathspec_file_nul) {
-		die(_("--pathspec-file-nul requires --pathspec-from-file"));
+		die(_("%s requires %s"), "--pathspec-file-nul", "--pathspec-from-file");
 	}
 
 	unborn = !strcmp(rev, "HEAD") && get_oid("HEAD", &oid);
@@ -459,7 +459,7 @@ int cmd_reset(int argc, const char **argv, const char *prefix)
 
 	if (patch_mode) {
 		if (reset_type != NONE)
-			die(_("--patch is incompatible with --{hard,mixed,soft}"));
+			die(_("%s and %s are mutually exclusive"), "--patch", "--{hard,mixed,soft}");
 		trace2_cmd_mode("patch-interactive");
 		return run_add_interactive(rev, "--patch=reset", &pathspec);
 	}
@@ -490,7 +490,7 @@ int cmd_reset(int argc, const char **argv, const char *prefix)
 		    _(reset_type_names[reset_type]));
 
 	if (intent_to_add && reset_type != MIXED)
-		die(_("-N can only be used with --mixed"));
+		die(_("%s requires %s"), "-N", "--mixed");
 
 	prepare_repo_settings(the_repository);
 	the_repository->settings.command_requires_full_index = 0;
