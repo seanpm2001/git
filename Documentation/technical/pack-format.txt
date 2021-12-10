@@ -376,6 +376,10 @@ CHUNK DATA:
 	[Optional] Object Large Offsets (ID: {'L', 'O', 'F', 'F'})
 	    8-byte offsets into large packfiles.
 
+	[Optional] Bitmap pack order (ID: {'P', 'O', 'R', 'D'})
+	    A list of 4-byte pack identifiers in sorted order according to
+	    their relative bitmap positions.
+
 TRAILER:
 
 	Index checksum of the above contents.
